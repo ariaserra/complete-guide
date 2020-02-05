@@ -13,18 +13,29 @@ import GoalItem from './components/GoalItem'
 
 export default function App() {
   const [courseGoals, setCourseGoals] = useState([]);
+  const [isAddMode, setIsAddMode] = useState(false);
 
   const addGoalHandler = goalTitle => {
-    setCourseGoals(currentGoals => [...currentGoals, {key: Math.random().toString(), value:goalTitle}]);
-    // setEnteredGoal('');
-  }
+    setCourseGoals(currentGoals => [...currentGoals, { key: Math.random().toString(), value: goalTitle }]);
+    setIsAddMode(false);
+  };
 
+  const removeGoalHandler = goalId => {
+    setCourseGoals(currentGoals => {
+      return currentGoals.filter((goal) => goal.key !== goalId);
+    });
+  };
 
   return (
     <View style={styles.screen} >
-      <GoalInput placeholder="Course goal" onAddGoal={addGoalHandler} />
-      <FlatList data={courseGoals}
-        renderItem={itemData => <GoalItem title={itemData.item.value} />}
+      <Button title="Add new goal" onPress={() => setIsAddMode(true)} />
+      <GoalInput placeholder="Course goal" onAddGoal={addGoalHandler} visible={isAddMode} onCancelGoal={() => setIsAddMode(false)}/>
+      <FlatList
+        keyExtractor={(item, index) => item.key}
+        data={courseGoals}
+        renderItem={itemData => (
+          <GoalItem id={itemData.item.key} title={itemData.item.value} onDelete={removeGoalHandler} />
+        )}
       />
     </View>
   );
@@ -33,5 +44,5 @@ export default function App() {
 const styles = StyleSheet.create({
   screen: {
     padding: 50
-  }  
+  }
 });
